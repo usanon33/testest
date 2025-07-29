@@ -9,10 +9,12 @@ let enemyBullets = [];
 let score = 0;
 let currentStage = 1;
 const maxStages = 2; // Define maximum stages
-let gameStatus = 'title'; // title, playing, win, lose, showingStageIntro
+let gameStatus = 'title'; // title, playing, win, lose, showingStageIntro, gameOverCountdown
 let needsStageReset = false; // Added for rotating title image
 let titleRotation = 0; // Added for rotating title image
 const stageIntroDuration = 1000; // 1 second
+let highestStageReached = 1; // New variable to store the highest stage reached
+let gameOverCountdownTime = 3; // Initial countdown time
 
 // Image assets
 const playerImage = new Image();
@@ -244,6 +246,7 @@ function updateBullets() {
                         gameStatus = 'playing';
                     }, stageIntroDuration);
                     needsStageReset = true; // Reset stage after intro
+                    highestStageReached = Math.max(highestStageReached, currentStage);
                 } else {
                     gameStatus = 'win';
                 }
@@ -293,7 +296,24 @@ function updateBullets() {
 
 function checkGameStatus() {
     if (playerHorde.length === 0 && gameStatus === 'playing') {
-        gameStatus = 'lose';
+        gameStatus = 'gameOverCountdown';
+        let countdown = 3;
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            gameOverCountdownTime = countdown;
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                gameStatus = 'title';
+                // Reset game state for new game
+                playerHorde = [];
+                hordeBullets = [];
+                enemyBullets = [];
+                score = 0;
+                currentStage = 1;
+                createHorde();
+                createEnemy();
+            }
+        }, 1000);
     }
 }
 
@@ -333,6 +353,10 @@ function draw() {
             ctx.drawImage(taiyoImage, -taiyoWidth / 2, -taiyoHeight / 2, taiyoWidth, taiyoHeight);
             ctx.restore();
         }
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        const highestStageMessage = `Highest Stage: ${highestStageReached}`;
+        ctx.fillText(highestStageMessage, canvas.width - ctx.measureText(highestStageMessage).width - 20, canvas.height - 30);
         return;
     } else if (gameStatus === 'showingStageIntro') {
         ctx.fillStyle = 'black';
@@ -399,6 +423,10 @@ function draw() {
             message = 'You Win!';
         }
         if (gameStatus === 'lose') message = 'Game Over';
+        if (gameStatus === 'gameOverCountdown') {
+            message = `Game Over! Returning to title in ${gameOverCountdownTime}`;
+            ctx.font = '30px Arial'; // Smaller font for countdown
+        }
         ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width / 2, canvas.height / 2);
     }
 }
