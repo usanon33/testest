@@ -9,9 +9,10 @@ let enemyBullets = [];
 let score = 0;
 let currentStage = 1;
 const maxStages = 2; // Define maximum stages
-let gameStatus = 'title'; // title, playing, win, lose
-let needsStageReset = false;
+let gameStatus = 'title'; // title, playing, win, lose, showingStageIntro
+let needsStageReset = false; // Added for rotating title image
 let titleRotation = 0; // Added for rotating title image
+const stageIntroDuration = 1000; // 1 second
 
 // Image assets
 const playerImage = new Image();
@@ -85,7 +86,10 @@ const keys = {
 // Event Listeners
 document.addEventListener('keydown', (e) => {
     if (gameStatus === 'title' && e.key === 'Enter') {
-        gameStatus = 'playing';
+        gameStatus = 'showingStageIntro';
+        setTimeout(() => {
+            gameStatus = 'playing';
+        }, stageIntroDuration);
         return;
     }
 
@@ -235,7 +239,11 @@ function updateBullets() {
                 score += 100;
                 if (currentStage < maxStages) {
                     currentStage++;
-                    needsStageReset = true; // Set flag instead of direct call
+                    gameStatus = 'showingStageIntro';
+                    setTimeout(() => {
+                        gameStatus = 'playing';
+                    }, stageIntroDuration);
+                    needsStageReset = true; // Reset stage after intro
                 } else {
                     gameStatus = 'win';
                 }
@@ -325,6 +333,14 @@ function draw() {
             ctx.drawImage(taiyoImage, -taiyoWidth / 2, -taiyoHeight / 2, taiyoWidth, taiyoHeight);
             ctx.restore();
         }
+        return;
+    } else if (gameStatus === 'showingStageIntro') {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '60px Arial';
+        const message = `STAGE ${currentStage}`;
+        ctx.fillText(message, canvas.width / 2 - ctx.measureText(message).width / 2, canvas.height / 2);
         return;
     }
 
