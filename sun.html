@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spiral Sun</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid #ccc;
+            background-color: #ffffff; /* White */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="sunCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('sunCanvas');
+        const ctx = canvas.getContext('2d');
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Draw sun rays
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 4;
+        for (let i = 0; i < 12; i++) {
+            const angle = (i / 12) * 2 * Math.PI;
+            ctx.beginPath();
+            const startRadius = 80;
+            const endRadius = 120;
+            ctx.moveTo(centerX + startRadius * Math.cos(angle), centerY + startRadius * Math.sin(angle));
+            ctx.lineTo(centerX + endRadius * Math.cos(angle), centerY + endRadius * Math.sin(angle));
+            ctx.stroke();
+        }
+
+        // Draw the spiral
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 5;
+
+        let radius = 0;
+        let angle = 0;
+        const maxRadius = 70;
+
+        for (let i = 0; i < 75; i++) { // Reduced iterations for a simpler look
+            radius += 1; // Increased radius step
+            angle += (Math.PI / 180) * 20; // Increased angle step for wider spiral
+            if (radius > maxRadius) {
+                break;
+            }
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+    </script>
+</body>
+</html>

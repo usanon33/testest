@@ -11,6 +11,7 @@ let currentStage = 1;
 const maxStages = 2; // Define maximum stages
 let gameStatus = 'title'; // title, playing, win, lose
 let needsStageReset = false;
+let titleRotation = 0; // Added for rotating title image
 
 // Image assets
 const playerImage = new Image();
@@ -36,6 +37,20 @@ spaceImage.src = 'space.png';
 let spaceImageLoaded = false;
 spaceImage.onload = () => {
     spaceImageLoaded = true;
+};
+
+const titleImage = new Image();
+titleImage.src = 'title.png';
+let titleImageLoaded = false;
+titleImage.onload = () => {
+    titleImageLoaded = true;
+};
+
+const taiyoImage = new Image();
+taiyoImage.src = 'taiyo.png';
+let taiyoImageLoaded = false;
+taiyoImage.onload = () => {
+    taiyoImageLoaded = true;
 };
 
 // Horde properties
@@ -101,7 +116,7 @@ function createHorde() {
 function createEnemy() {
     let hp = enemyInitialHP;
     if (currentStage === 2) {
-        hp = 20;
+        hp = 12;
     }
     enemy = { x: enemyX, y: enemyY, width: enemyWidth, height: enemyHeight, alive: true, hp: hp, maxHp: hp };
 }
@@ -295,16 +310,21 @@ function draw() {
     }
 
     if (gameStatus === 'title') {
-        ctx.fillStyle = 'white';
-        ctx.font = '80px Arial';
-        ctx.fillText('Reverse Invaders', canvas.width / 2 - ctx.measureText('Reverse Invaders').width / 2, canvas.height / 2 - 40);
-        ctx.font = '30px Arial';
-        ctx.fillText('Press Enter to Start', canvas.width / 2 - ctx.measureText('Press Enter to Start').width / 2, canvas.height / 2 + 40);
-        ctx.font = '20px Arial';
-        ctx.fillText('Move: Left/Right Arrow Keys', canvas.width / 2 - ctx.measureText('Move: Left/Right Arrow Keys').width / 2, canvas.height / 2 + 100);
-        ctx.fillText('Shoot: Spacebar', canvas.width / 2 - ctx.measureText('Shoot: Spacebar').width / 2, canvas.height / 2 + 130);
-        ctx.fillText('Shoot Left: Left Arrow + Spacebar', canvas.width / 2 - ctx.measureText('Shoot Left: Left Arrow + Spacebar').width / 2, canvas.height / 2 + 160);
-        ctx.fillText('Shoot Right: Right Arrow + Spacebar', canvas.width / 2 - ctx.measureText('Shoot Right: Right Arrow + Spacebar').width / 2, canvas.height / 2 + 190);
+        if (titleImageLoaded) {
+            ctx.drawImage(titleImage, 0, 0, canvas.width, canvas.height);
+        }
+        if (taiyoImageLoaded) {
+            const taiyoWidth = 200;
+            const taiyoHeight = 200;
+            const taiyoX = canvas.width - taiyoWidth - 20;
+            const taiyoY = 20;
+
+            ctx.save();
+            ctx.translate(taiyoX + taiyoWidth / 2, taiyoY + taiyoHeight / 2);
+            ctx.rotate(titleRotation);
+            ctx.drawImage(taiyoImage, -taiyoWidth / 2, -taiyoHeight / 2, taiyoWidth, taiyoHeight);
+            ctx.restore();
+        }
         return;
     }
 
@@ -378,6 +398,8 @@ function gameLoop() {
         updateEnemy();
         updateBullets();
         checkGameStatus();
+    } else if (gameStatus === 'title') {
+        titleRotation += 0.005; // Adjust rotation speed as needed
     }
     draw();
     requestAnimationFrame(gameLoop);
