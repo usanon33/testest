@@ -8,7 +8,7 @@ let hordeBullets = [];
 let enemyBullets = [];
 let score = 0;
 let currentStage = 1;
-const maxStages = 2; // Define maximum stages
+const maxStages = 5; // Define maximum stages
 let gameStatus = 'title'; // title, playing, win, lose, showingStageIntro, gameOverCountdown
 let needsStageReset = false; // Added for rotating title image
 let titleRotation = 0; // Added for rotating title image
@@ -54,6 +54,20 @@ taiyoImage.src = 'taiyo.png';
 let taiyoImageLoaded = false;
 taiyoImage.onload = () => {
     taiyoImageLoaded = true;
+};
+
+const redImage = new Image();
+redImage.src = 'red.png';
+let redImageLoaded = false;
+redImage.onload = () => {
+    redImageLoaded = true;
+};
+
+const yozoraImage = new Image();
+yozoraImage.src = 'yozora.png';
+let yozoraImageLoaded = false;
+yozoraImage.onload = () => {
+    yozoraImageLoaded = true;
 };
 
 // Horde properties
@@ -123,6 +137,12 @@ function createEnemy() {
     let hp = enemyInitialHP;
     if (currentStage === 2) {
         hp = 12;
+    } else if (currentStage === 3) {
+        hp = 15;
+    } else if (currentStage === 4) {
+        hp = 20;
+    } else if (currentStage === 5) {
+        hp = 25;
     }
     enemy = { x: enemyX, y: enemyY, width: enemyWidth, height: enemyHeight, alive: true, hp: hp, maxHp: hp };
 }
@@ -330,6 +350,12 @@ function draw() {
 
     if (currentStage === 2 && spaceImageLoaded) {
         ctx.drawImage(spaceImage, 0, 0, canvas.width, canvas.height);
+    } else if (currentStage === 3 && redImageLoaded) {
+        ctx.drawImage(redImage, 0, 0, canvas.width, canvas.height);
+    } else if (currentStage === 4 && yozoraImageLoaded) {
+        ctx.drawImage(yozoraImage, 0, 0, canvas.width, canvas.height);
+    } else if (currentStage === 5 && backgroundImageLoaded) {
+        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     } else if (backgroundImageLoaded) {
         ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
     } else {
