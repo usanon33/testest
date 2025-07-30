@@ -15,6 +15,8 @@ let titleRotation = 0; // Added for rotating title image
 const stageIntroDuration = 1000; // 1 second
 let highestStageReached = 1; // New variable to store the highest stage reached
 let gameOverCountdownTime = 3; // Initial countdown time
+let kumoX = -200; // Initial x position of the cloud
+let kumo2X = canvas.width;
 
 // Image assets
 const playerImage = new Image();
@@ -75,6 +77,13 @@ mizuiroImage.src = 'mizuiro.png';
 let mizuiroImageLoaded = false;
 mizuiroImage.onload = () => {
     mizuiroImageLoaded = true;
+};
+
+const kumoImage = new Image();
+kumoImage.src = 'kumo.png';
+let kumoImageLoaded = false;
+kumoImage.onload = () => {
+    kumoImageLoaded = true;
 };
 
 // Horde properties
@@ -405,6 +414,12 @@ function draw() {
             ctx.drawImage(taiyoImage, -taiyoWidth / 2, -taiyoHeight / 2, taiyoWidth, taiyoHeight);
             ctx.restore();
         }
+
+        if (kumoImageLoaded) {
+            ctx.drawImage(kumoImage, kumoX, canvas.height - 200, 200, 100);
+            ctx.drawImage(kumoImage, kumo2X, 20, 200, 100);
+        }
+
         ctx.fillStyle = 'white';
         ctx.font = '20px Arial';
         const highestStageMessage = `Highest Stage: ${highestStageReached}`;
@@ -496,6 +511,14 @@ function gameLoop() {
         checkGameStatus();
     } else if (gameStatus === 'title') {
         titleRotation += 0.005; // Adjust rotation speed as needed
+        kumoX += 0.5; // Adjust cloud speed as needed
+        if (kumoX > canvas.width) {
+            kumoX = -200; // Reset cloud position
+        }
+        kumo2X -= 0.5; // Adjust cloud speed as needed
+        if (kumo2X < -200) {
+            kumo2X = canvas.width; // Reset cloud position
+        }
     }
     draw();
     requestAnimationFrame(gameLoop);
