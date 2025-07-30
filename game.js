@@ -8,7 +8,7 @@ let hordeBullets = [];
 let enemyBullets = [];
 let score = 0;
 let currentStage = 1;
-const maxStages = 5; // Define maximum stages
+const maxStages = 10; // Define maximum stages
 let gameStatus = 'title'; // title, playing, win, lose, showingStageIntro, gameOverCountdown
 let needsStageReset = false; // Added for rotating title image
 let titleRotation = 0; // Added for rotating title image
@@ -68,6 +68,13 @@ yozoraImage.src = 'yozora.png';
 let yozoraImageLoaded = false;
 yozoraImage.onload = () => {
     yozoraImageLoaded = true;
+};
+
+const mizuiroImage = new Image();
+mizuiroImage.src = 'mizuiro.png';
+let mizuiroImageLoaded = false;
+mizuiroImage.onload = () => {
+    mizuiroImageLoaded = true;
 };
 
 // Horde properties
@@ -143,6 +150,16 @@ function createEnemy() {
         hp = 20;
     } else if (currentStage === 5) {
         hp = 25;
+    } else if (currentStage === 6) {
+        hp = 30;
+    } else if (currentStage === 7) {
+        hp = 35;
+    } else if (currentStage === 8) {
+        hp = 40;
+    } else if (currentStage === 9) {
+        hp = 45;
+    } else if (currentStage === 10) {
+        hp = 50;
     }
     enemy = { x: enemyX, y: enemyY, width: enemyWidth, height: enemyHeight, alive: true, hp: hp, maxHp: hp };
 }
@@ -221,7 +238,14 @@ function updateEnemy() {
         enemy.x = nextX;
     }
 
-    if (Math.random() < 0.05) {
+    let fireRate = 0.05;
+    if (currentStage >= 3 && currentStage <= 5) {
+        fireRate = 0.075;
+    } else if (currentStage >= 6) {
+        fireRate = 0.1;
+    }
+
+    if (Math.random() < fireRate) {
         const attackType = Math.random();
         if (attackType < 0.6) {
             // Normal shot
@@ -348,19 +372,21 @@ function resetStage() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (currentStage === 2 && spaceImageLoaded) {
-        ctx.drawImage(spaceImage, 0, 0, canvas.width, canvas.height);
-    } else if (currentStage === 3 && redImageLoaded) {
-        ctx.drawImage(redImage, 0, 0, canvas.width, canvas.height);
-    } else if (currentStage === 4 && yozoraImageLoaded) {
-        ctx.drawImage(yozoraImage, 0, 0, canvas.width, canvas.height);
-    } else if (currentStage === 5 && backgroundImageLoaded) {
-        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-    } else if (backgroundImageLoaded) {
-        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-    } else {
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Determine background based on game state
+    if (gameStatus === 'title') {
+        if (backgroundImageLoaded) { // sora.png for title
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        } else {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+    } else { // For all other states (playing, win, lose, etc.)
+        if (mizuiroImageLoaded) { // mizuiro.png for stages
+            ctx.drawImage(mizuiroImage, 0, 0, canvas.width, canvas.height);
+        } else {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
     }
 
     if (gameStatus === 'title') {
